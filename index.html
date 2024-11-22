@@ -23,7 +23,7 @@
 
         .container {
             max-width: 1200px;
-            margin: 20px;
+            margin: 20px auto;
             padding: 20px;
             background: #ffffff;
             border-radius: 8px;
@@ -184,27 +184,27 @@
         <!-- Блок поиска аудитории -->
 		<div class="search-container">
 			<!-- Поле "Поиск аудитории" -->
-		<div style="position: relative;">
+		<div style="position: relative; padding: 10px;">
 			<label for="audience-search">Поиск аудитории:</label>
 			<input id="audience-search" type="text" placeholder="Введите номер или название аудитории">
 			<ul id="suggestions-list" class="suggestions-list"></ul>
 		</div>
 
 		<!-- Откуда -->
-		<div style="position: relative; margin-top: 20px;">
+		<div style="position: relative; margin-top: 20px; padding: 10px;">
 			<label for="route-from">Откуда:</label>
 			<input id="route-from" type="text" placeholder="Введите начальную точку">
 			<ul id="suggestions-list-from" class="suggestions-list"></ul>
 		</div>
 
 		<!-- Куда -->
-		<div style="position: relative; margin-top: 20px;">
+		<div style="position: relative; margin-top: 20px; padding: 10px;">
 			<label for="route-to">Куда:</label>
 			<input id="route-to" type="text" placeholder="Введите конечную точку">
 			<ul id="suggestions-list-to" class="suggestions-list"></ul>
 		</div>
 
-			<button class="button" onclick="calculateRoute()">Построить маршрут</button>
+			<button style="padding: 10px;" class="button" onclick="calculateRoute()">Построить маршрут</button>
 		</div>
 
 
