@@ -188,35 +188,41 @@ function setPosition(inputElement, suggestionList) {
          * Загрузка SVG карты этажа
          */
         function loadFloorMap() {
-	    const building = document.getElementById("building").value;
-	    const floor = document.getElementById("floor").value;
-	
-	    if (!building || !floor) return;
-	
-	    const mapFile = `maps/${building}-${floor}.svg`;
-	    const svgContainer = document.getElementById("svg-container");
-	
-	    fetch(mapFile)
-	        .then(response => {
-	            if (response.ok) {
-	                return response.text(); // Загружаем содержимое SVG
-	            } else {
-	                console.error(`Файл карты ${mapFile} не найден.`);
-	                svgContainer.innerHTML = `<p>Карта недоступна.</p>`;
-	                return null;
-	            }
-	        })
-	        .then(svgContent => {
-	            if (svgContent) {
-	                svgContainer.innerHTML = svgContent; // Встраиваем SVG
-	                enableSvgInteraction(); // Подключаем интерактивность
-	            }
-	        })
-	        .catch(err => {
-	            console.error(`Ошибка при загрузке карты: ${err}`);
-	            svgContainer.innerHTML = `<p>Произошла ошибка при загрузке карты.</p>`;
-	        });
-	}
+    const building = document.getElementById("building").value;
+    const floor = document.getElementById("floor").value;
+
+    if (!building || !floor) return;
+
+    const mapFile = `maps/${building}-${floor}.svg`;
+    const svgContainer = document.getElementById("svg-container");
+
+    fetch(mapFile)
+        .then(response => {
+            if (response.ok) {
+                return response.text(); // Загружаем содержимое SVG
+            } else {
+                console.error(`Файл карты ${mapFile} не найден.`);
+                svgContainer.innerHTML = `<p>Карта недоступна.</p>`;
+                return null;
+            }
+        })
+        .then(svgContent => {
+            if (svgContent) {
+                svgContainer.innerHTML = svgContent; // Встраиваем SVG
+                const svgElement = svgContainer.querySelector("svg");
+                if (svgElement) {
+                    svgElement.setAttribute("width", "100%"); // Растягиваем
+                    svgElement.setAttribute("height", "100%");
+                }
+                enableSvgInteraction(); // Подключаем интерактивность
+            }
+        })
+        .catch(err => {
+            console.error(`Ошибка при загрузке карты: ${err}`);
+            svgContainer.innerHTML = `<p>Произошла ошибка при загрузке карты.</p>`;
+        });
+}
+
 
 
 
