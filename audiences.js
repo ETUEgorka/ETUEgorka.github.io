@@ -198,25 +198,20 @@ function setPosition(inputElement, suggestionList) {
 	
 	    fetch(mapFile)
 	        .then(response => {
-	            if (response.ok) {
-	                return response.text(); // Загружаем содержимое SVG
-	            } else {
-	                console.error(`Файл карты ${mapFile} не найден.`);
-	                svgContainer.innerHTML = `<p>Карта недоступна.</p>`;
-	                return null;
-	            }
+	            if (!response.ok) throw new Error("SVG файл не найден");
+	            return response.text();
 	        })
-	        .then(svgContent => {
-	            if (svgContent) {
-	                svgContainer.innerHTML = svgContent; // Встраиваем SVG
-	                enableSvgInteraction(); // Подключаем интерактивность
-	            }
+	        .then(svgData => {
+	            svgContainer.innerHTML = svgData; // Загружаем SVG
+	            const svgElement = svgContainer.querySelector("svg");
+	            svgElement.style.transform = "scale(2)"; // Увеличиваем в 2 раза
+	            svgElement.style.transformOrigin = "center"; // Центрируем увеличение
 	        })
-	        .catch(err => {
-	            console.error(`Ошибка при загрузке карты: ${err}`);
-	            svgContainer.innerHTML = `<p>Произошла ошибка при загрузке карты.</p>`;
+	        .catch(error => {
+	            svgContainer.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
 	        });
 	}
+
 
 
 
