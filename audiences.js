@@ -19,21 +19,22 @@ const buildings = {
 
 // База данных помещений и зон
 const places = [
-    { id: "101", floor: 1, building: "1", type: "аудитория", color: "#6da9f2" },
-    { id: "102", floor: 1, building: "1", type: "аудитория", color: "#6da9f2" },
-    { id: "201", floor: 2, building: "1", type: "аудитория", color: "#6da9f2" },
-    { id: "Дарья", floor: 1, building: "2", type: "зона еды", color: "#f2d06d" },
-    { id: "Варя", floor: 2, building: "2", type: "зона еды", color: "#f2d06d" },
-    { id: "Буфет первого корпуса", floor: 1, building: "1", type: "зона еды", color: "#f2d06d" },
-    { id: "314А", floor: 3, building: "1", type: "лаборатория", color: "#d088f2" },
-    { id: "401B", floor: 4, building: "2", type: "лаборатория", color: "#d088f2" },
-    { id: "505C", floor: 5, building: "3", type: "аудитория", color: "#6da9f2" },
-    { id: "Коридор_1_1", floor: 1, building: "1", type: "коридор", color: "#d3d3d3" },
-    { id: "Коридор_2_1", floor: 2, building: "1", type: "коридор", color: "#d3d3d3" },
-    { id: "K101", floor: 1, building: "K", type: "аудитория", color: "#6da9f2" },
-    { id: "M202", floor: 2, building: "M", type: "аудитория", color: "#6da9f2" },
-    { id: "E303", floor: 3, building: "E", type: "лаборатория", color: "#d088f2" },
-    { id: "T505", floor: 5, building: "T", type: "прочие зоны", color: "#9fc6a8" }
+    { id: "4501", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4502", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4503", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4503-1", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4504", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4504-1", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4505", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4506", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4507", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4508", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4508-1", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4508-2", floor: 5, building: "4", type: "аудитория"},
+	{ id: "4509", floor: 5, building: "4", type: "аудитория"},
+	
+	{ id: "toilet_man", floor: 5, building: "4", type: "туалет мужской"},
+
 ];
 
 
@@ -106,4 +107,119 @@ function setPosition(inputElement, suggestionList) {
     suggestionList.style.width = `${inputElement.offsetWidth}px`; // Ширина как у поля
     suggestionList.style.zIndex = "1000";
 }
+
+
+
+
+
+
+        /**
+         * Инициализация корпусов
+         * Заполняет список корпусов при загрузке страницы
+         */
+        function initBuildings() {
+			const buildingSelect = document.getElementById("building");
+			for (const building in buildings) {
+				const option = document.createElement("option");
+				option.value = building;
+				option.textContent = `Корпус ${building}`;
+				buildingSelect.appendChild(option);
+			}
+			updateFloors(); // Обновляем этажи для первого корпуса
+			loadFloorMap(); // Загружаем карту для первого корпуса и этажа
+		}
+
+
+        /**
+         * Обновление этажей в зависимости от выбранного корпуса
+         */
+        function updateFloors() {
+			const building = document.getElementById("building").value;
+			const floorSelect = document.getElementById("floor");
+			const floors = buildings[building] || 0;
+
+			floorSelect.innerHTML = ""; // Очищаем старые этажи
+
+			for (let i = 1; i <= floors; i++) {
+				const option = document.createElement("option");
+				option.value = i;
+				option.textContent = `Этаж ${i}`;
+				floorSelect.appendChild(option);
+			}
+			loadFloorMap(); // Загружаем карту после обновления списка этажей
+		}
+
+
+        /**
+         * Отображение подсказок при поиске аудитории
+         */
+        function showSuggestions(query) {
+            const list = document.getElementById("suggestions-list");
+            list.innerHTML = ""; // Очищаем старые подсказки
+            if (!query) return; // Если поле пустое, не отображаем подсказки
+
+            // Фильтруем список по запросу
+            const matches = suggestions.filter(item => item.toLowerCase().includes(query.toLowerCase()));
+            matches.forEach(match => {
+                const li = document.createElement("li");
+                li.textContent = match;
+                li.onclick = () => {
+                    document.getElementById("audience-search").value = match;
+                    list.innerHTML = ""; // Убираем подсказки
+                };
+                list.appendChild(li);
+            });
+        }
+
+        /**
+         * Построение маршрута
+         */
+        function calculateRoute() {
+            const from = document.getElementById("route-from").value;
+            const to = document.getElementById("route-to").value;
+            if (from && to) {
+                alert(`Построение маршрута от ${from} до ${to}`);
+            } else {
+                alert("Пожалуйста, заполните оба поля!");
+            }
+        }
+
+        /**
+         * Загрузка SVG карты этажа
+         */
+        function loadFloorMap() {
+			const building = document.getElementById("building").value;
+			const floor = document.getElementById("floor").value;
+
+			if (!building || !floor) {
+				console.error("Корпус или этаж не выбраны.");
+				return;
+			}
+
+			const mapFile = `maps/${building}-${floor}.svg`; // Укажите правильный путь к файлам
+			const svgContainer = document.getElementById("floor-map");
+
+			// Проверка доступности файла перед загрузкой
+			fetch(mapFile)
+				.then(response => {
+					if (response.ok) {
+						svgContainer.data = mapFile; // Загружаем SVG карту
+						console.log(`Карта ${mapFile} успешно загружена.`);
+					} else {
+						svgContainer.data = ""; // Очищаем, если карта недоступна
+						console.error(`Файл карты ${mapFile} не найден.`);
+						alert("Карта для выбранного корпуса и этажа недоступна.");
+					}
+				})
+				.catch(err => {
+					svgContainer.data = ""; // Очистить контейнер на случай ошибки
+					console.error(`Ошибка при загрузке карты ${mapFile}: ${err}`);
+					alert("Произошла ошибка при загрузке карты. Проверьте консоль для подробностей.");
+				});
+		}
+
+
+        // Инициализация при загрузке страницы
+        document.addEventListener("DOMContentLoaded", initBuildings);
+
 
