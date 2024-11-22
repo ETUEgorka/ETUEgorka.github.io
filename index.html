@@ -51,7 +51,6 @@
 
         .button {
 	    margin: 15px;
-            padding: 10px 20px;
             background-color: #bb8d54;
             border: none;
             color: #ffffff;
@@ -185,27 +184,28 @@
         <!-- Блок поиска аудитории -->
 		<div class="search-container">
 			<!-- Поле "Поиск аудитории" -->
-		<div style="position: relative; padding-right: 30px;">
+		<div style="position: relative; padding-right: 20px;">
 			<label for="audience-search">Поиск аудитории:</label>
 			<input id="audience-search" type="text" placeholder="Введите номер или название аудитории">
 			<ul id="suggestions-list" class="suggestions-list"></ul>
 		</div>
 
 		<!-- Откуда -->
-		<div style="position: relative; margin-top: 20px; padding-right: 30px;">
+		<div style="position: relative; margin-top: 20px; padding-right: 20px;">
 			<label for="route-from">Откуда:</label>
 			<input id="route-from" type="text" placeholder="Введите начальную точку">
 			<ul id="suggestions-list-from" class="suggestions-list"></ul>
 		</div>
 
 		<!-- Куда -->
-		<div style="position: relative; margin-top: 20px; padding-right: 30px;">
+		<div style="position: relative; margin-top: 20px; padding-right: 20px;">
 			<label for="route-to">Куда:</label>
 			<input id="route-to" type="text" placeholder="Введите конечную точку">
 			<ul id="suggestions-list-to" class="suggestions-list"></ul>
 		</div>
-
+		<div style="position: relative; margin-top: 20px; padding-right: 20px;">
 			<button class="button" onclick="calculateRoute()">Построить маршрут</button>
+		</div>
 		</div>
 
 
