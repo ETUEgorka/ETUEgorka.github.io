@@ -110,6 +110,26 @@ function setPosition(inputElement, suggestionList) {
 
 
 
+function searchAudience() {
+    const query = document.getElementById("audience-search").value;
+    if (query) {
+        showSuggestions(query); // Используем уже существующую функцию подсказок
+    }
+}
+
+function searchFrom() {
+    const query = document.getElementById("route-from").value;
+    if (query) {
+        showSuggestions(query); // Или другая логика для поиска точки отправления
+    }
+}
+
+function searchTo() {
+    const query = document.getElementById("route-to").value;
+    if (query) {
+        showSuggestions(query); // Или другая логика для поиска точки назначения
+    }
+}
 
 
 
