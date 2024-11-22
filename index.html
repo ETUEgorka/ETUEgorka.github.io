@@ -50,21 +50,22 @@
         }
 
         .button {
-	    width: 100%;
-            height: 40px;
-	    display: flex;
-	    flex-direction: column;
-            background-color: #bb8d54;
-            border: none;
-            color: #ffffff;
-            font-size: 16px;
-	    
-            border-radius: 4px;
-            cursor: pointer;
-        }
+	    width: 100%; /* Кнопка растягивается на всю ширину */
+	    height: 40px; /* Высота кнопки */
+	    display: flex; /* Используем Flexbox для выравнивания текста */
+	    align-items: center; /* Вертикальное выравнивание текста */
+	    justify-content: center; /* Горизонтальное выравнивание текста */
+	    background-color: #bb8d54; /* Фон кнопки */
+	    border: none; /* Убираем границы */
+	    color: #d3d3d3; /* Сероватый цвет текста */
+	    font-size: 16px; /* Размер текста */
+	    border-radius: 4px; /* Скруглённые углы */
+	    cursor: pointer; /* Указываем, что это кликабельный элемент */
+	    font-weight: bold; /* Немного утолщаем текст */
+	}
 
         .button:hover {
-            background-color: #9c7545;
+            background-color: #9c7545; /* Более тёмный фон при наведении */
         }
 
         .svg-container {
@@ -207,7 +208,7 @@
 			<input id="route-to" type="text" placeholder="Введите конечную точку">
 			<ul id="suggestions-list-to" class="suggestions-list"></ul>
 		</div>
-		<div style="position: relative; margin-top: 20px; margin-bottom: 20px; text-align: center;">
+		<div style="position: relative; margin-top: 20px; margin-bottom: 20px;">
 			<button class="button"  onclick="calculateRoute()">Построить маршрут</button>
 		</div>
 		</div>
