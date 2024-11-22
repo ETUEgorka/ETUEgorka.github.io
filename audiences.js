@@ -329,6 +329,55 @@ svgContainer.addEventListener("mousemove", (event) => {
         svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
     }
 });
-	}
+}
+
+
+function highlightRoom(roomId) {
+    // Убираем подсветку с предыдущих элементов
+    const svgElement = document.querySelector("#svg-container svg");
+    if (!svgElement) {
+        console.error("SVG карта не загружена.");
+        return;
+    }
+    const previouslyHighlighted = svgElement.querySelector(".highlighted");
+    if (previouslyHighlighted) {
+        previouslyHighlighted.classList.remove("highlighted");
+    }
+
+    // Ищем элемент по ID
+    const roomElement = svgElement.querySelector(`#room_${roomId}`);
+    if (!roomElement) {
+        alert("Помещение не найдено на текущей карте.");
+        return;
+    }
+
+    // Подсвечиваем элемент
+    roomElement.classList.add("highlighted");
+
+    // Центрируем карту на элементе
+    centerSvgOnElement(roomElement);
+}
+
+
+
+function centerSvgOnElement(element) {
+    const svgContainer = document.getElementById("svg-container");
+    const svgElement = svgContainer.querySelector("svg");
+
+    // Получаем размеры и положение элемента
+    const bbox = element.getBBox();
+    const svgBox = svgElement.getBBox();
+
+    // Вычисляем смещение для центрирования
+    const centerX = svgBox.x + bbox.x + bbox.width / 2;
+    const centerY = svgBox.y + bbox.y + bbox.height / 2;
+
+    const offsetX = svgContainer.clientWidth / 2 - centerX;
+    const offsetY = svgContainer.clientHeight / 2 - centerY;
+
+    // Обновляем положение карты
+    svgElement.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+}
+
 
 
