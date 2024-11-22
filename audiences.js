@@ -380,4 +380,10 @@ function centerSvgOnElement(element) {
 }
 
 
+document.getElementById("audience-search").addEventListener("input", (event) => {
+    const query = event.target.value.trim();
+    if (query) {
+        highlightRoom(query);
+    }
+});
 
