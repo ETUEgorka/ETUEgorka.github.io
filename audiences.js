@@ -267,51 +267,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-function enableSvgInteraction() {
-    const svgElement = document.querySelector("#svg-container svg");
-
-    if (!svgElement) {
-        console.error("SVG-карта не найдена.");
-        return;
-    }
-
-    let scale = 1;
-    let panX = 0, panY = 0;
-    let isDragging = false;
-    let startX, startY;
-
-    const svgContainer = document.getElementById("svg-container");
-
-    // Масштабирование
-    svgContainer.addEventListener("wheel", (event) => {
-        event.preventDefault();
-        const delta = event.deltaY > 0 ? 0.9 : 1.1;
-        scale = Math.min(Math.max(scale * delta, 0.5), 3);
-        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-    });
-
-    // Начало перетаскивания
-    svgContainer.addEventListener("mousedown", (event) => {
-        isDragging = true;
-        startX = event.clientX - panX;
-        startY = event.clientY - panY;
-        svgContainer.style.cursor = "grabbing";
-    });
-
-    // Завершение перетаскивания
-    document.addEventListener("mouseup", () => {
-        isDragging = false;
-        svgContainer.style.cursor = "grab";
-    });
-
-    // Перетаскивание
-    svgContainer.addEventListener("mousemove", (event) => {
-        if (isDragging) {
-            panX = event.clientX - startX;
-            panY = event.clientY - startY;
-            svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-        }
-    });
-}
+	function enableSvgInteraction() {
+	    const svgElement = document.querySelector("#svg-container svg");
+	
+	    if (!svgElement) {
+	        console.error("SVG-карта не найдена.");
+	        return;
+	    }
+	
+	    let scale = 1;
+	    let panX = 0, panY = 0;
+	    let isDragging = false;
+	    let startX, startY;
+	    let isUpdating = false; // Флаг для предотвращения частых обновлений
+	
+	    const svgContainer = document.getElementById("svg-container");
+	
+	    // Масштабирование
+	    svgContainer.addEventListener("wheel", (event) => {
+	        event.preventDefault();
+	        const delta = event.deltaY > 0 ? 0.9 : 1.1;
+	        scale = Math.min(Math.max(scale * delta, 0.5), 3);
+	        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+	    });
+	
+	    // Начало перетаскивания
+	    svgContainer.addEventListener("mousedown", (event) => {
+	        isDragging = true;
+	        startX = event.clientX - panX;
+	        startY = event.clientY - panY;
+	        svgContainer.style.cursor = "grabbing";
+	    });
+	
+	    // Завершение перетаскивания
+	    document.addEventListener("mouseup", () => {
+	        isDragging = false;
+	        svgContainer.style.cursor = "grab";
+	    });
+	
+	    // Перетаскивание
+	    svgContainer.addEventListener("mousemove", (event) => {
+	        if (isDragging && !isUpdating) {
+	            isUpdating = true;
+	            requestAnimationFrame(() => {
+	                panX = event.clientX - startX;
+	                panY = event.clientY - startY;
+	                svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+	                isUpdating = false;
+	            });
+	        }
+	    });
+	}
 
 
