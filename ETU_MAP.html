@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ETU.MAP (LETI.MAP)</title>
     <style>
+        /* Общий стиль для страницы */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
@@ -12,12 +13,14 @@
             margin: 0;
             padding: 0;
         }
+
         header {
             background-color: #05336e;
             color: #ffffff;
-            padding: 10px 20px;
+            padding: 15px 20px;
             text-align: center;
         }
+
         .container {
             max-width: 1200px;
             margin: 20px auto;
@@ -26,49 +29,28 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .map-container {
-            position: relative;
-            margin: 20px 0;
-            border: 2px solid #6d6e71;
-            height: 600px;
-        }
-        .map {
-            width: 100%;
-            height: 100%;
-            background-color: #eaeaea;
-            position: absolute;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            color: #6d6e71;
-        }
-        .controls {
+
+        .controls-inline {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
             margin-bottom: 20px;
         }
-        .dropdown {
+
+        .dropdown, .search-container div {
             flex: 1;
-            min-width: 200px;
         }
-        .dropdown label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .dropdown select {
+
+        .dropdown select, .search-container input {
             width: 100%;
             padding: 10px;
             border: 1px solid #6d6e71;
             border-radius: 4px;
             background-color: #ffffff;
         }
+
         .button {
-		
+			margin-top: 15px;
             padding: 10px 20px;
             background-color: #bb8d54;
             border: none;
@@ -76,74 +58,130 @@
             font-size: 16px;
             border-radius: 4px;
             cursor: pointer;
-            flex-shrink: 0;
         }
+
         .button:hover {
             background-color: #9c7545;
         }
-        .search-container {
-		
-            display: none;
+
+        .svg-container {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ccc;
             margin-top: 20px;
         }
+
+        .search-container {
+			display: flex;
+			flex-direction: column;
+			gap: 15px; /* Отступы между группами полей */
+		}
+
+		/* Поле с лейблом и текстовым вводом */
+		.field-group {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			gap: 5px; /* Отступы между лейблом и полем ввода */
+		}
+		
+
+		.suggestions-list {
+			position: absolute;
+			background-color: white;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			max-height: 150px;
+			overflow-y: auto;
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			z-index: 1000;
+			display: none; /* Скрыт по умолчанию */
+			box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Тень для красоты */
+		}
+
+		.suggestions-list li {
+			padding: 8px;
+			cursor: pointer;
+			border-bottom: 1px solid #eee;
+			font-size: 14px;
+		}
+
+		.suggestions-list li:last-child {
+			border-bottom: none;
+		}
+
+		.suggestions-list li:hover {
+			background-color: #f0f0f0;
+		}
+
+
+
         footer {
             text-align: center;
-            padding: 10px 20px;
+            padding: 15px 20px;
             background-color: #05336e;
             color: #ffffff;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
         }
     </style>
 </head>
 <body>
+    <!-- Заголовок страницы -->
     <header>
         <h1>ETU.MAP (LETI.MAP)</h1>
         <p>Интерактивная карта корпусов и этажей</p>
     </header>
 
     <div class="container">
-        <!-- Выбор корпуса и этажа -->
-        <div class="controls">
+        <!-- Блок выбора корпуса и этажа -->
+        <div class="controls-inline">
+            <!-- Выбор корпуса -->
             <div class="dropdown">
-                <label for="building">Выберите корпус:</label>
-                <select id="building" onchange="updateFloors()">
-                    <!-- Корпуса будут добавлены из файла audiences.js -->
+                <label for="building">Корпус:</label>
+                <select id="building" onchange="updateFloors(); loadFloorMap();">
+                    <!-- Корпуса добавляются программно -->
                 </select>
             </div>
+            <!-- Выбор этажа -->
             <div class="dropdown">
-                <label for="floor">Выберите этаж:</label>
-                <select id="floor">
-                    <!-- Этажи будут добавлены из файла audiences.js -->
+                <label for="floor">Этаж:</label>
+                <select id="floor" onchange="loadFloorMap();">
+                    <!-- Этажи добавляются программно -->
                 </select>
             </div>
         </div>
 
-        <!-- Кнопки поиска -->
-        <div class="controls">
-            <button class="button" onclick="showSearch('audience')">Поиск аудитории</button>
-            <button class="button" onclick="showSearch('route')">Поиск маршрута</button>
-        </div>
+        <!-- Блок поиска аудитории -->
+		<div class="search-container">
+			<!-- Поле "Поиск аудитории" -->
+		<div style="position: relative;">
+			<label for="audience-search">Поиск аудитории:</label>
+			<input id="audience-search" type="text" placeholder="Введите номер или название аудитории">
+			<ul id="suggestions-list" class="suggestions-list"></ul>
+		</div>
 
-        <!-- Форма поиска аудитории -->
-        <div id="search-audience" class="search-container">
-            <label for="audience-search">Введите номер или название аудитории:</label>
-            <input type="text" id="audience-search" placeholder="Например, 314 или Варя (буфет)" oninput="suggest('audience-search', suggestions)">
-        </div>
+		<!-- Откуда -->
+		<div style="position: relative; margin-top: 20px;">
+			<label for="route-from">Откуда:</label>
+			<input id="route-from" type="text" placeholder="Введите начальную точку">
+			<ul id="suggestions-list-from" class="suggestions-list"></ul>
+		</div>
 
-        <!-- Форма поиска маршрута -->
-        <div id="search-route" class="search-container">
-            <label for="route-from">Откуда:</label>
-            <input type="text" id="route-from" placeholder="Введите начальную точку" oninput="suggest('route-from', suggestions)">
-            <label for="route-to">Куда:</label>
-            <input type="text" id="route-to" placeholder="Введите конечную точку" oninput="suggest('route-to', suggestions)">
-        </div>
+		<!-- Куда -->
+		<div style="position: relative; margin-top: 20px;">
+			<label for="route-to">Куда:</label>
+			<input id="route-to" type="text" placeholder="Введите конечную точку">
+			<ul id="suggestions-list-to" class="suggestions-list"></ul>
+		</div>
 
-        <div class="map-container">
-            <div class="map" id="map">
-                <p>Выберите корпус и этаж, чтобы увидеть карту.</p>
-            </div>
+			<button class="button" onclick="calculateRoute()">Построить маршрут</button>
+		</div>
+
+
+        <!-- Блок для отображения SVG карты -->
+        <div class="svg-container">
+            <object id="floor-map" type="image/svg+xml" width="100%" height="100%"></object>
         </div>
     </div>
 
@@ -151,11 +189,13 @@
         <p>© 2024 ETU.MAP (LETI.MAP). Все права защищены.</p>
     </footer>
 
-    <!-- Подключение базы данных аудиторий и корпусов -->
+    <!-- Подключение файла с данными о корпусах и аудиториях -->
     <script src="audiences.js"></script>
-
     <script>
-        // Инициализация корпусов и этажей
+        /**
+         * Инициализация корпусов
+         * Заполняет список корпусов при загрузке страницы
+         */
         function initBuildings() {
             const buildingSelect = document.getElementById("building");
             for (const building in buildings) {
@@ -164,16 +204,17 @@
                 option.textContent = `Корпус ${building}`;
                 buildingSelect.appendChild(option);
             }
-            updateFloors();
+            updateFloors(); // Обновляем этажи для первого корпуса
         }
 
-        // Обновление этажей при выборе корпуса
+        /**
+         * Обновление этажей в зависимости от выбранного корпуса
+         */
         function updateFloors() {
             const building = document.getElementById("building").value;
             const floorSelect = document.getElementById("floor");
             const floors = buildings[building] || 0;
-
-            floorSelect.innerHTML = "";
+            floorSelect.innerHTML = ""; // Очищаем старые этажи
             for (let i = 1; i <= floors; i++) {
                 const option = document.createElement("option");
                 option.value = i;
@@ -182,21 +223,54 @@
             }
         }
 
-        // Показ формы поиска
-        function showSearch(type) {
-            document.getElementById("search-audience").style.display = type === "audience" ? "block" : "none";
-            document.getElementById("search-route").style.display = type === "route" ? "block" : "none";
+        /**
+         * Отображение подсказок при поиске аудитории
+         */
+        function showSuggestions(query) {
+            const list = document.getElementById("suggestions-list");
+            list.innerHTML = ""; // Очищаем старые подсказки
+            if (!query) return; // Если поле пустое, не отображаем подсказки
+
+            // Фильтруем список по запросу
+            const matches = suggestions.filter(item => item.toLowerCase().includes(query.toLowerCase()));
+            matches.forEach(match => {
+                const li = document.createElement("li");
+                li.textContent = match;
+                li.onclick = () => {
+                    document.getElementById("audience-search").value = match;
+                    list.innerHTML = ""; // Убираем подсказки
+                };
+                list.appendChild(li);
+            });
         }
 
-        // Автозаполнение
-        function suggest(inputId, data) {
-            const input = document.getElementById(inputId);
-            const query = input.value.toLowerCase();
-            const matches = data.filter(item => item.toLowerCase().includes(query));
-            console.log("Suggestions for", query, ":", matches);
+        /**
+         * Построение маршрута
+         */
+        function calculateRoute() {
+            const from = document.getElementById("route-from").value;
+            const to = document.getElementById("route-to").value;
+            if (from && to) {
+                alert(`Построение маршрута от ${from} до ${to}`);
+            } else {
+                alert("Пожалуйста, заполните оба поля!");
+            }
         }
 
-        // Инициализация страницы
+        /**
+         * Загрузка SVG карты этажа
+         */
+        function loadFloorMap() {
+            const building = document.getElementById("building").value;
+            const floor = document.getElementById("floor").value;
+
+            // Формируем путь к карте
+            const mapFile = `${building}-${floor}.svg`;
+            const svgContainer = document.getElementById("floor-map");
+            svgContainer.data = mapFile; // Загружаем SVG файл
+        }
+
+        // Инициализация при загрузке страницы
         document.addEventListener("DOMContentLoaded", initBuildings);
     </script>
 </body>
