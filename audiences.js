@@ -270,7 +270,10 @@ document.addEventListener("DOMContentLoaded", () => {
 function enableSvgInteraction() {
     const svgElement = document.querySelector("#svg-container svg");
 
-    if (!svgElement) return; // Если SVG не загружен, ничего не делаем
+    if (!svgElement) {
+        console.error("SVG-карта не найдена.");
+        return;
+    }
 
     let scale = 1;
     let panX = 0, panY = 0;
@@ -282,10 +285,9 @@ function enableSvgInteraction() {
     // Масштабирование
     svgContainer.addEventListener("wheel", (event) => {
         event.preventDefault();
-        const delta = event.deltaY > 0 ? 0.9 : 1.1; // Уменьшаем или увеличиваем масштаб
-        scale = Math.min(Math.max(scale * delta, 0.5), 3); // Ограничиваем масштаб
+        const delta = event.deltaY > 0 ? 0.9 : 1.1;
+        scale = Math.min(Math.max(scale * delta, 0.5), 3);
         svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-        svgElement.style.transformOrigin = "center center";
     });
 
     // Начало перетаскивания
@@ -311,4 +313,5 @@ function enableSvgInteraction() {
         }
     });
 }
+
 
