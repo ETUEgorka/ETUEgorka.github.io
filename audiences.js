@@ -188,35 +188,27 @@ function setPosition(inputElement, suggestionList) {
          * Загрузка SVG карты этажа
          */
         function loadFloorMap() {
-			const building = document.getElementById("building").value;
-			const floor = document.getElementById("floor").value;
+	    const building = document.getElementById("building").value;
+	    const floor = document.getElementById("floor").value;
+	
+	    if (!building || !floor) return; // Ничего не делаем, если данные не выбраны
+	
+	    const mapFile = `maps/${building}-${floor}.svg`; // Путь к файлу
+	    const svgContainer = document.getElementById("floor-map");
+	
+	    fetch(mapFile)
+	        .then(response => {
+	            if (response.ok) {
+	                svgContainer.data = mapFile; // Загрузка карты
+	            } else {
+	                svgContainer.data = ""; // Очищаем контейнер, если файл не найден
+	            }
+	        })
+	        .catch(() => {
+	            svgContainer.data = ""; // Очищаем контейнер на случай ошибки
+	        });
+	}
 
-			if (!building || !floor) {
-				console.error("Корпус или этаж не выбраны.");
-				return;
-			}
-
-			const mapFile = `maps/${building}-${floor}.svg`; // Укажите правильный путь к файлам
-			const svgContainer = document.getElementById("floor-map");
-
-			// Проверка доступности файла перед загрузкой
-			fetch(mapFile)
-				.then(response => {
-					if (response.ok) {
-						svgContainer.data = mapFile; // Загружаем SVG карту
-						console.log(`Карта ${mapFile} успешно загружена.`);
-					} else {
-						svgContainer.data = ""; // Очищаем, если карта недоступна
-						console.error(`Файл карты ${mapFile} не найден.`);
-						alert("Карта для выбранного корпуса и этажа недоступна.");
-					}
-				})
-				.catch(err => {
-					svgContainer.data = ""; // Очистить контейнер на случай ошибки
-					console.error(`Ошибка при загрузке карты ${mapFile}: ${err}`);
-					alert("Произошла ошибка при загрузке карты. Проверьте консоль для подробностей.");
-				});
-		}
 
 
         // Инициализация при загрузке страницы
