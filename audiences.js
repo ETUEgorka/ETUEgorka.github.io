@@ -188,32 +188,36 @@ function setPosition(inputElement, suggestionList) {
          * Загрузка SVG карты этажа
          */
         function loadFloorMap() {
-    const building = document.getElementById("building").value;
-    const floor = document.getElementById("floor").value;
+	    const building = document.getElementById("building").value;
+	    const floor = document.getElementById("floor").value;
+	
+	    if (!building || !floor) return;
+	
+	    const mapFile = `maps/${building}-${floor}.svg`;
+	    const svgContainer = document.getElementById("svg-container");
+	
+	    fetch(mapFile)
+	        .then(response => {
+	            if (response.ok) {
+	                return response.text(); // Загружаем содержимое SVG
+	            } else {
+	                console.error(`Файл карты ${mapFile} не найден.`);
+	                svgContainer.innerHTML = `<p>Карта недоступна.</p>`;
+	                return null;
+	            }
+	        })
+	        .then(svgContent => {
+	            if (svgContent) {
+	                svgContainer.innerHTML = svgContent; // Встраиваем SVG
+	                enableSvgInteraction(); // Подключаем интерактивность
+	            }
+	        })
+	        .catch(err => {
+	            console.error(`Ошибка при загрузке карты: ${err}`);
+	            svgContainer.innerHTML = `<p>Произошла ошибка при загрузке карты.</p>`;
+	        });
+	}
 
-    if (!building || !floor) return; // Ничего не делаем, если данные не выбраны
-
-    const mapFile = `maps/${building}-${floor}.svg`; // Путь к файлу
-    const svgContainer = document.getElementById("svg-container");
-
-    fetch(mapFile)
-        .then(response => {
-            if (response.ok) {
-                return response.text(); // Получаем содержимое SVG как текст
-            } else {
-                console.error(`Файл карты ${mapFile} не найден.`);
-                svgContainer.innerHTML = ""; // Очищаем контейнер
-            }
-        })
-        .then(svgContent => {
-            svgContainer.innerHTML = svgContent; // Встраиваем SVG в контейнер
-            enableSvgInteraction(); // Подключаем взаимодействие
-        })
-        .catch(err => {
-            console.error(`Ошибка при загрузке карты: ${err}`);
-            svgContainer.innerHTML = ""; // Очищаем контейнер
-        });
-}
 
 
 
