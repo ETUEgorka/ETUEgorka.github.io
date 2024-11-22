@@ -188,26 +188,32 @@ function setPosition(inputElement, suggestionList) {
          * Загрузка SVG карты этажа
          */
         function loadFloorMap() {
-	    const building = document.getElementById("building").value;
-	    const floor = document.getElementById("floor").value;
-	
-	    if (!building || !floor) return; // Ничего не делаем, если данные не выбраны
-	
-	    const mapFile = `maps/${building}-${floor}.svg`; // Путь к файлу
-	    const svgContainer = document.getElementById("floor-map");
-	
-	    fetch(mapFile)
-	        .then(response => {
-	            if (response.ok) {
-	                svgContainer.data = mapFile; // Загрузка карты
-	            } else {
-	                svgContainer.data = ""; // Очищаем контейнер, если файл не найден
-	            }
-	        })
-	        .catch(() => {
-	            svgContainer.data = ""; // Очищаем контейнер на случай ошибки
-	        });
-	}
+    const building = document.getElementById("building").value;
+    const floor = document.getElementById("floor").value;
+
+    if (!building || !floor) return; // Ничего не делаем, если данные не выбраны
+
+    const mapFile = `maps/${building}-${floor}.svg`; // Путь к файлу
+    const svgContainer = document.getElementById("svg-container");
+
+    fetch(mapFile)
+        .then(response => {
+            if (response.ok) {
+                return response.text(); // Получаем содержимое SVG как текст
+            } else {
+                console.error(`Файл карты ${mapFile} не найден.`);
+                svgContainer.innerHTML = ""; // Очищаем контейнер
+            }
+        })
+        .then(svgContent => {
+            svgContainer.innerHTML = svgContent; // Встраиваем SVG в контейнер
+            enableSvgInteraction(); // Подключаем взаимодействие
+        })
+        .catch(err => {
+            console.error(`Ошибка при загрузке карты: ${err}`);
+            svgContainer.innerHTML = ""; // Очищаем контейнер
+        });
+}
 
 
 
@@ -254,4 +260,51 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+
+
+function enableSvgInteraction() {
+    const svgElement = document.querySelector("#svg-container svg");
+
+    if (!svgElement) return; // Если SVG не загружен, ничего не делаем
+
+    let scale = 1;
+    let panX = 0, panY = 0;
+    let isDragging = false;
+    let startX, startY;
+
+    const svgContainer = document.getElementById("svg-container");
+
+    // Масштабирование
+    svgContainer.addEventListener("wheel", (event) => {
+        event.preventDefault();
+        const delta = event.deltaY > 0 ? 0.9 : 1.1; // Уменьшаем или увеличиваем масштаб
+        scale = Math.min(Math.max(scale * delta, 0.5), 3); // Ограничиваем масштаб
+        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+        svgElement.style.transformOrigin = "center center";
+    });
+
+    // Начало перетаскивания
+    svgContainer.addEventListener("mousedown", (event) => {
+        isDragging = true;
+        startX = event.clientX - panX;
+        startY = event.clientY - panY;
+        svgContainer.style.cursor = "grabbing";
+    });
+
+    // Завершение перетаскивания
+    document.addEventListener("mouseup", () => {
+        isDragging = false;
+        svgContainer.style.cursor = "grab";
+    });
+
+    // Перетаскивание
+    svgContainer.addEventListener("mousemove", (event) => {
+        if (isDragging) {
+            panX = event.clientX - startX;
+            panY = event.clientY - startY;
+            svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+        }
+    });
+}
 
