@@ -214,4 +214,44 @@ function setPosition(inputElement, suggestionList) {
         // Инициализация при загрузке страницы
         document.addEventListener("DOMContentLoaded", initBuildings);
 
+document.addEventListener("DOMContentLoaded", () => {
+    const svgContainer = document.getElementById("svg-container");
+    const floorMap = document.getElementById("floor-map");
+
+    let scale = 1;
+    let panX = 0, panY = 0;
+    let isDragging = false;
+    let startX, startY;
+
+    // Масштабирование
+    svgContainer.addEventListener("wheel", (event) => {
+        event.preventDefault();
+        const delta = event.deltaY > 0 ? 0.9 : 1.1; // Уменьшаем или увеличиваем масштаб
+        scale = Math.min(Math.max(scale * delta, 0.5), 3); // Ограничиваем масштаб
+        floorMap.style.transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
+    });
+
+    // Начало перетаскивания
+    svgContainer.addEventListener("mousedown", (event) => {
+        isDragging = true;
+        startX = event.clientX - panX;
+        startY = event.clientY - panY;
+        svgContainer.style.cursor = "grabbing";
+    });
+
+    // Завершение перетаскивания
+    document.addEventListener("mouseup", () => {
+        isDragging = false;
+        svgContainer.style.cursor = "grab";
+    });
+
+    // Перетаскивание
+    svgContainer.addEventListener("mousemove", (event) => {
+        if (isDragging) {
+            panX = event.clientX - startX;
+            panY = event.clientY - startY;
+            floorMap.style.transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
+        }
+    });
+});
 
