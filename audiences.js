@@ -203,9 +203,7 @@ function setPosition(inputElement, suggestionList) {
 	        })
 	        .then(svgData => {
 	            svgContainer.innerHTML = svgData; // Загружаем SVG
-	            const svgElement = svgContainer.querySelector("svg");
-	            svgElement.style.transform = "scale(2)"; // Увеличиваем в 2 раза
-	            svgElement.style.transformOrigin = "center"; // Центрируем увеличение
+	            enableSvgInteraction(); // Активируем взаимодействие
 	        })
 	        .catch(error => {
 	            svgContainer.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
