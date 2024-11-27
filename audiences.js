@@ -202,13 +202,19 @@ function setPosition(inputElement, suggestionList) {
 	            return response.text();
 	        })
 	        .then(svgData => {
-	            svgContainer.innerHTML = svgData; // Загружаем SVG
-	            enableSvgInteraction(); // Активируем взаимодействие
+	            svgContainer.innerHTML = svgData;
+	
+	            // Дождаться добавления SVG в DOM
+	            setTimeout(() => {
+	                enableSvgInteraction();
+	            }, 100); // Небольшая задержка
 	        })
 	        .catch(error => {
+	            console.error(`Ошибка загрузки SVG: ${error.message}`);
 	            svgContainer.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
 	        });
 	}
+
 
 
 
@@ -261,62 +267,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 	function enableSvgInteraction() {
-	    const svgElement = document.querySelector("#svg-container svg");
-	
-	    if (!svgElement) {
-	        console.error("SVG-карта не найдена.");
-	        return;
-	    }
-	
-	    let scale = 1;
-	    let panX = 0, panY = 0;
-	    let isDragging = false;
-	    let startX, startY;
-	
-	    // Масштабирование колесиком мыши
-	    svgElement.addEventListener("wheel", (event) => {
-	        event.preventDefault();
-	        const delta = event.deltaY > 0 ? 0.9 : 1.1; // Масштаб вниз или вверх
-	        const rect = svgElement.getBoundingClientRect();
-	        const mouseX = (event.clientX - rect.left) / rect.width;
-	        const mouseY = (event.clientY - rect.top) / rect.height;
-	
-	        scale = Math.min(Math.max(scale * delta, 0.5), 3); // Ограничиваем масштаб
-	        panX -= (mouseX - 0.5) * rect.width * (delta - 1); // Центрируем масштаб
-	        panY -= (mouseY - 0.5) * rect.height * (delta - 1);
-	
-	        updateTransform(svgElement, scale, panX, panY);
-	    });
-	
-	    // Начало перетаскивания
-	    svgElement.addEventListener("mousedown", (event) => {
-	        isDragging = true;
-	        startX = event.clientX - panX;
-	        startY = event.clientY - panY;
-	        svgElement.style.cursor = "grabbing";
-	    });
-	
-	    // Завершение перетаскивания
-	    document.addEventListener("mouseup", () => {
-	        isDragging = false;
-	        svgElement.style.cursor = "default";
-	    });
-	
-	    // Перетаскивание карты
-	    svgElement.addEventListener("mousemove", (event) => {
-	        if (isDragging) {
-	            panX = event.clientX - startX;
-	            panY = event.clientY - startY;
-	            updateTransform(svgElement, scale, panX, panY);
-	        }
-	    });
-	
-	    // Обновление трансформации SVG
-	    function updateTransform(element, scale, x, y) {
-	        element.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
-	        element.style.transformOrigin = "center center";
-	    }
-	}
+    const svgElement = document.querySelector("#svg-container svg");
+
+    if (!svgElement) {
+        console.error("SVG-карта не найдена.");
+        return;
+    }
+
+    let scale = 1;
+    let panX = 0, panY = 0;
+    let isDragging = false;
+    let startX, startY;
+
+    // Масштабирование колесиком мыши
+    svgElement.addEventListener("wheel", (event) => {
+        event.preventDefault();
+        const delta = event.deltaY > 0 ? 0.9 : 1.1; // Уменьшение или увеличение масштаба
+        scale = Math.min(Math.max(scale * delta, 0.5), 3); // Ограничение масштаба
+        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    });
+
+    // Начало перетаскивания
+    svgElement.addEventListener("mousedown", (event) => {
+        isDragging = true;
+        startX = event.clientX - panX;
+        startY = event.clientY - panY;
+        svgElement.style.cursor = "grabbing";
+    });
+
+    // Завершение перетаскивания
+    document.addEventListener("mouseup", () => {
+        isDragging = false;
+        svgElement.style.cursor = "default";
+    });
+
+    // Перетаскивание SVG
+    svgElement.addEventListener("mousemove", (event) => {
+        if (isDragging) {
+            panX = event.clientX - startX;
+            panY = event.clientY - startY;
+            svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+        }
+    });
+
+    console.log("SVG Interaction enabled.");
+}
+
 
 
 
