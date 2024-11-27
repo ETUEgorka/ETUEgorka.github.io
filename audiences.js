@@ -272,56 +272,38 @@ document.addEventListener("DOMContentLoaded", () => {
 	    let panX = 0, panY = 0;
 	    let isDragging = false;
 	    let startX, startY;
-	    let isUpdating = false; // Флаг для предотвращения частых обновлений
 	
-	    const svgContainer = document.getElementById("svg-container");
-	
-	    // Масштабирование
-	    svgContainer.addEventListener("wheel", (event) => {
+	    // Масштабирование с помощью колеса мыши
+	    svgElement.addEventListener("wheel", (event) => {
 	        event.preventDefault();
-	        const delta = event.deltaY > 0 ? 0.9 : 1.1;
-	        scale = Math.min(Math.max(scale * delta, 0.5), 3);
+	        const delta = event.deltaY > 0 ? 0.9 : 1.1; // Уменьшаем или увеличиваем масштаб
+	        scale = Math.min(Math.max(scale * delta, 0.5), 3); // Ограничиваем масштаб
 	        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
 	    });
 	
 	    // Начало перетаскивания
-	    svgContainer.addEventListener("mousedown", (event) => {
+	    svgElement.addEventListener("mousedown", (event) => {
 	        isDragging = true;
 	        startX = event.clientX - panX;
 	        startY = event.clientY - panY;
-	        svgContainer.style.cursor = "grabbing";
+	        svgElement.style.cursor = "grabbing";
 	    });
 	
 	    // Завершение перетаскивания
-	    let velocityX = 0, velocityY = 0;
+	    document.addEventListener("mouseup", () => {
+	        isDragging = false;
+	        svgElement.style.cursor = "grab";
+	    });
+	
+	    // Перетаскивание
+	    svgElement.addEventListener("mousemove", (event) => {
+	        if (isDragging) {
+	            panX = event.clientX - startX;
+	            panY = event.clientY - startY;
+	            svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+	        }
+	    });
+	}
 
-document.addEventListener("mouseup", () => {
-    isDragging = false;
-    svgContainer.style.cursor = "grab";
-
-    const inertia = setInterval(() => {
-        if (Math.abs(velocityX) < 0.1 && Math.abs(velocityY) < 0.1) {
-            clearInterval(inertia);
-            return;
-        }
-        panX += velocityX;
-        panY += velocityY;
-        velocityX *= 0.95; // Постепенно уменьшаем скорость
-        velocityY *= 0.95;
-        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-    }, 16); // Около 60 FPS
-});
-
-svgContainer.addEventListener("mousemove", (event) => {
-    if (isDragging) {
-        velocityX = event.movementX; // Расчёт скорости
-        velocityY = event.movementY;
-
-        panX = event.clientX - startX;
-        panY = event.clientY - startY;
-        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-    }
-});
-}
 
 
