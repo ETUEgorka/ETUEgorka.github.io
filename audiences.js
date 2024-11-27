@@ -222,6 +222,7 @@ function setPosition(inputElement, suggestionList) {
         // Инициализация при загрузке страницы
         document.addEventListener("DOMContentLoaded", initBuildings);
 
+
 document.addEventListener("DOMContentLoaded", () => {
     const svgContainer = document.getElementById("svg-container");
     const floorMap = document.getElementById("floor-map");
@@ -311,6 +312,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("SVG Interaction enabled.");
 }
+
+
 
 
 
