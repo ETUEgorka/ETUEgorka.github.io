@@ -203,11 +203,6 @@ function setPosition(inputElement, suggestionList) {
 	        })
 	        .then(svgData => {
 	            svgContainer.innerHTML = svgData;
-
-			const svgElement = svgContainer.querySelector("svg");
-        		const initialScale = 2; // Укажите начальный масштаб (например, 2x)
-        		svgElement.style.transform = `scale(${initialScale})`;
-        		svgElement.style.transformOrigin = "center center";
 	            // Дождаться добавления SVG в DOM
 	            setTimeout(() => {
 	                enableSvgInteraction();
