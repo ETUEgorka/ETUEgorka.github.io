@@ -212,28 +212,10 @@ function setPosition(inputElement, suggestionList) {
 	            console.error(`Ошибка загрузки SVG: ${error.message}`);
 	            svgContainer.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
 	        });
-		const svgElement = document.querySelector("#floor-map");
-		svgElement.addEventListener("load", centerSVG);
+
 	}
 
 
-function centerSVG() {
-    const svg = document.querySelector("#floor-map");
-    const container = document.querySelector(".svg-container");
-
-    if (svg && container) {
-        const svgBox = svg.getBBox(); // Получаем размер SVG
-        const containerBox = container.getBoundingClientRect(); // Получаем размер контейнера
-
-        const scale = Math.min(
-            containerBox.width / svgBox.width,
-            containerBox.height / svgBox.height
-        );
-
-        // Устанавливаем трансформации для центрирования
-        svg.style.transform = `translate(${(containerBox.width - svgBox.width * scale) / 2}px, ${(containerBox.height - svgBox.height * scale) / 2}px) scale(${scale})`;
-    }
-}
 
 // Вызываем функцию после загрузки SVG
 window.addEventListener("load", centerSVG);
