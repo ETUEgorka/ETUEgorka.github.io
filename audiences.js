@@ -224,7 +224,7 @@ window.addEventListener("load", centerSVG);
 
 
         // Инициализация при загрузке страницы
-        document.addEventListener("DOMContentLoaded", initBuildings);
+document.addEventListener("DOMContentLoaded", initBuildings);
 
 document.addEventListener("DOMContentLoaded", () => {
     const svgContainer = document.getElementById("svg-container");
