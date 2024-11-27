@@ -202,29 +202,22 @@ function setPosition(inputElement, suggestionList) {
 	            return response.text();
 	        })
 	        .then(svgData => {
-	            svgContainer.innerHTML = svgData;
-	            // Дождаться добавления SVG в DOM
-	            setTimeout(() => {
-	                enableSvgInteraction();
-	            }, 100); // Небольшая задержка
+	            svgContainer.innerHTML = svgData; // Загружаем SVG
+	            const svgElement = svgContainer.querySelector("svg");
+	            svgElement.style.transform = "scale(2)"; // Увеличиваем в 2 раза
+	            svgElement.style.transformOrigin = "center"; // Центрируем увеличение
 	        })
 	        .catch(error => {
-	            console.error(`Ошибка загрузки SVG: ${error.message}`);
 	            svgContainer.innerHTML = `<p style="color: red;">Ошибка: ${error.message}</p>`;
 	        });
-
 	}
 
-
-
-// Вызываем функцию после загрузки SVG
-window.addEventListener("load", centerSVG);
 
 
 
 
         // Инициализация при загрузке страницы
-document.addEventListener("DOMContentLoaded", initBuildings);
+        document.addEventListener("DOMContentLoaded", initBuildings);
 
 document.addEventListener("DOMContentLoaded", () => {
     const svgContainer = document.getElementById("svg-container");
@@ -270,56 +263,67 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 	function enableSvgInteraction() {
-    const svgElement = document.querySelector("#svg-container svg");
+	    const svgElement = document.querySelector("#svg-container svg");
+	
+	    if (!svgElement) {
+	        console.error("SVG-карта не найдена.");
+	        return;
+	    }
+	
+	    let scale = 1;
+	    let panX = 0, panY = 0;
+	    let isDragging = false;
+	    let startX, startY;
+	    let isUpdating = false; // Флаг для предотвращения частых обновлений
+	
+	    const svgContainer = document.getElementById("svg-container");
+	
+	    // Масштабирование
+	    svgContainer.addEventListener("wheel", (event) => {
+	        event.preventDefault();
+	        const delta = event.deltaY > 0 ? 0.9 : 1.1;
+	        scale = Math.min(Math.max(scale * delta, 0.5), 3);
+	        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+	    });
+	
+	    // Начало перетаскивания
+	    svgContainer.addEventListener("mousedown", (event) => {
+	        isDragging = true;
+	        startX = event.clientX - panX;
+	        startY = event.clientY - panY;
+	        svgContainer.style.cursor = "grabbing";
+	    });
+	
+	    // Завершение перетаскивания
+	    let velocityX = 0, velocityY = 0;
 
-    if (!svgElement) {
-        console.error("SVG-карта не найдена.");
-        return;
-    }
+document.addEventListener("mouseup", () => {
+    isDragging = false;
+    svgContainer.style.cursor = "grab";
 
-    let scale = 1;
-    let panX = 0, panY = 0;
-    let isDragging = false;
-    let startX, startY;
-
-    // Масштабирование колесиком мыши
-    svgElement.addEventListener("wheel", (event) => {
-        event.preventDefault();
-        const delta = event.deltaY > 0 ? 0.9 : 1.1; // Уменьшение или увеличение масштаба
-        scale = Math.min(Math.max(scale * delta, 0.5), 3); // Ограничение масштаба
-        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-    });
-
-    // Начало перетаскивания
-    svgElement.addEventListener("mousedown", (event) => {
-        isDragging = true;
-        startX = event.clientX - panX;
-        startY = event.clientY - panY;
-        svgElement.style.cursor = "grabbing";
-    });
-
-    // Завершение перетаскивания
-    document.addEventListener("mouseup", () => {
-        isDragging = false;
-        svgElement.style.cursor = "default";
-    });
-
-    // Перетаскивание SVG
-    svgElement.addEventListener("mousemove", (event) => {
-        if (isDragging) {
-            panX = event.clientX - startX;
-            panY = event.clientY - startY;
-            svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    const inertia = setInterval(() => {
+        if (Math.abs(velocityX) < 0.1 && Math.abs(velocityY) < 0.1) {
+            clearInterval(inertia);
+            return;
         }
-    });
+        panX += velocityX;
+        panY += velocityY;
+        velocityX *= 0.95; // Постепенно уменьшаем скорость
+        velocityY *= 0.95;
+        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    }, 16); // Около 60 FPS
+});
 
-    console.log("SVG Interaction enabled.");
+svgContainer.addEventListener("mousemove", (event) => {
+    if (isDragging) {
+        velocityX = event.movementX; // Расчёт скорости
+        velocityY = event.movementY;
+
+        panX = event.clientX - startX;
+        panY = event.clientY - startY;
+        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    }
+});
 }
-
-
-
-
-
-
 
 
