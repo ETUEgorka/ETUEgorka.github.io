@@ -273,12 +273,19 @@ document.addEventListener("DOMContentLoaded", () => {
 	    let isDragging = false;
 	    let startX, startY;
 	
-	    // Масштабирование с помощью колеса мыши
+	    // Масштабирование колесиком мыши
 	    svgElement.addEventListener("wheel", (event) => {
 	        event.preventDefault();
-	        const delta = event.deltaY > 0 ? 0.9 : 1.1; // Уменьшаем или увеличиваем масштаб
+	        const delta = event.deltaY > 0 ? 0.9 : 1.1; // Масштаб вниз или вверх
+	        const rect = svgElement.getBoundingClientRect();
+	        const mouseX = (event.clientX - rect.left) / rect.width;
+	        const mouseY = (event.clientY - rect.top) / rect.height;
+	
 	        scale = Math.min(Math.max(scale * delta, 0.5), 3); // Ограничиваем масштаб
-	        svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+	        panX -= (mouseX - 0.5) * rect.width * (delta - 1); // Центрируем масштаб
+	        panY -= (mouseY - 0.5) * rect.height * (delta - 1);
+	
+	        updateTransform(svgElement, scale, panX, panY);
 	    });
 	
 	    // Начало перетаскивания
@@ -292,18 +299,25 @@ document.addEventListener("DOMContentLoaded", () => {
 	    // Завершение перетаскивания
 	    document.addEventListener("mouseup", () => {
 	        isDragging = false;
-	        svgElement.style.cursor = "grab";
+	        svgElement.style.cursor = "default";
 	    });
 	
-	    // Перетаскивание
+	    // Перетаскивание карты
 	    svgElement.addEventListener("mousemove", (event) => {
 	        if (isDragging) {
 	            panX = event.clientX - startX;
 	            panY = event.clientY - startY;
-	            svgElement.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+	            updateTransform(svgElement, scale, panX, panY);
 	        }
 	    });
+	
+	    // Обновление трансформации SVG
+	    function updateTransform(element, scale, x, y) {
+	        element.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+	        element.style.transformOrigin = "center center";
+	    }
 	}
+
 
 
 
