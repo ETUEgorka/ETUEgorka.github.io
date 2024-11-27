@@ -80,7 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 li.textContent = `${suggestion.id} (Корпус ${suggestion.building}, Этаж ${suggestion.floor}, ${suggestion.type})`;
                 li.onclick = () => {
                     inputElement.value = suggestion.id;
-			moveToAudience(suggestion.id);
                     suggestionList.innerHTML = ""; // Очищаем список
                     suggestionList.style.display = "none"; // Прячем список
                 };
@@ -319,53 +318,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-/**
- * Перемещение карты к указанной аудитории
- */
-function moveToAudience(audienceId) {
-    const svgElement = document.querySelector("#svg-container svg");
-    if (!svgElement) {
-        console.error("SVG карта не загружена.");
-        return;
-    }
-
-    // Находим элемент SVG для аудитории
-    const audienceElement = svgElement.querySelector(`#room_${audienceId}`);
-    if (!audienceElement) {
-        alert("Аудитория не найдена на карте!");
-        return;
-    }
-
-    // Получаем координаты аудитории в системе координат SVG
-    const bbox = audienceElement.getBBox();
-    const svgContainer = document.querySelector(".svg-container");
-
-    // Размеры контейнера
-    const containerWidth = svgContainer.clientWidth;
-    const containerHeight = svgContainer.clientHeight;
-
-    // Вычисляем масштаб для подгонки
-    const scale = Math.min(
-        containerWidth / bbox.width,
-        containerHeight / bbox.height
-    );
-
-    // Центрируем на выбранной аудитории
-    const translateX = (containerWidth / 2 - (bbox.x + bbox.width / 2) * scale) / scale;
-    const translateY = (containerHeight / 2 - (bbox.y + bbox.height / 2) * scale) / scale;
-
-    // Применяем трансформации
-    svgElement.style.transformOrigin = "0 0"; // От верхнего левого угла
-    svgElement.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
-}
-
-/**
- * Привязка события к полю поиска
- */
-document.getElementById("audience-search").addEventListener("change", () => {
-    const audienceId = document.getElementById("audience-search").value.trim();
-    moveToAudience(audienceId); // Перемещаем карту к аудитории
-});
 
 
 
